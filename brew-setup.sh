@@ -65,4 +65,6 @@ cd fonts
 cd ..
 rm -rf fonts/
 
+touch .hushlogin # to remove the "Last login" message from iTerm
+
 echo "\n\n\n***************************************************\n*** Everything is ready. Enjoy your rocket Mac! ***\n***************************************************"
