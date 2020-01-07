@@ -18,8 +18,14 @@ brew install node
 # Dev Tools
 brew install git
 brew install wget
-# And definitely check plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
-brew cask install iterm2
+brew cask install iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
+brew install zsh
+chsh -s /usr/local/bin/zsh
+brew install zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+brew install zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" # Install “Oh My ZSH”
 brew cask install sublime-text
 brew cask install visual-studio-code
 brew cask install sourcetree
@@ -36,9 +42,6 @@ brew cask install telegram
 brew cask install google-chrome
 brew cask install firefox
 
-# Magnet
-mas install 441258766
-
 # Tools
 brew cask install cloudapp
 brew cask install gimp
@@ -47,6 +50,8 @@ brew cask install vlc
 brew cask install 1password
 brew cask install appcleaner
 brew cask install pocket
+mas install 568494494 # Pocket
+mas install 441258766 # Magnet
 
 # Entertainment
 brew cask install spotify
@@ -54,3 +59,11 @@ brew cask install steam
 
 #Fonts
 brew cask install font-hack
+
+git clone https://github.com/powerline/fonts.git
+cd fonts
+./install.sh
+cd ..
+rm -rf fonts/
+
+echo "Everything is ready. Enjoy your rocket Mac!"
