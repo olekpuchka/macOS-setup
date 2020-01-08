@@ -2,6 +2,8 @@
 
 echo "Installing brew..."
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew update # to make sure Homebrew is up to date
+brew doctor # to make sure your system is ready to brew
 
 echo "Installing brew tap/cask..."
 brew tap caskroom/cask
