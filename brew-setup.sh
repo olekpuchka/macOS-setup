@@ -45,12 +45,12 @@ brew cask install google-chrome
 brew cask install firefox
 
 # Tools
-brew cask install cloudapp
 brew cask install gimp
 brew cask install the-unarchiver
 brew cask install vlc
 brew cask install 1password
 brew cask install appcleaner
+brew cask install dropbox
 mas install 568494494 # Pocket
 mas install 441258766 # Magnet
 
