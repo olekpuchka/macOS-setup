@@ -1,3 +1,4 @@
+
 #!/bin/sh
 
 echo "Installing brew..."
@@ -53,6 +54,8 @@ brew cask install appcleaner
 brew cask install dropbox
 mas install 568494494 # Pocket
 mas install 441258766 # Magnet
+brew cask install alfred
+brew cask install latest
 
 # Entertainment
 brew cask install spotify
