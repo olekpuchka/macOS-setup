@@ -53,7 +53,7 @@ brew cask install 1password
 brew cask install appcleaner
 brew cask install dropbox
 mas install 568494494 # Pocket
-mas install 441258766 # Magnet
+brew cask install rectangle
 brew cask install alfred
 brew cask install latest
 
