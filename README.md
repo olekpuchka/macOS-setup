@@ -1,3 +1,8 @@
-# macsetup
+# macOS Setup
 
-Brew mac setup for working environment
+Apps and brew setup for macOS environment
+
+## Run script
+```
+sh setup.sh
+```
