@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 echo "Installing brew..."
@@ -21,6 +20,8 @@ brew install node
 # Dev Tools
 brew install git
 brew install wget
+brew install tree
+brew install diff-so-fancy
 brew cask install iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
 brew install zsh
 chsh -s /usr/local/bin/zsh
@@ -43,7 +44,13 @@ brew cask install telegram
 
 # Browsers
 brew cask install google-chrome
-brew cask install firefox
+
+# Install/Signin App Store apps via mas
+# use mas search [appname] to find id's
+mas signin
+mas install 568494494 # Pocket
+mas install 904280696 # Things 3
+
 
 # Tools
 brew cask install gimp
@@ -52,14 +59,12 @@ brew cask install vlc
 brew cask install 1password
 brew cask install appcleaner
 brew cask install dropbox
-mas install 568494494 # Pocket
 brew cask install rectangle
 brew cask install alfred
 brew cask install latest
 
 # Entertainment
 brew cask install spotify
-brew cask install steam
 
 #Fonts
 brew cask install font-hack
@@ -71,5 +76,26 @@ cd ..
 rm -rf fonts/
 
 touch .hushlogin # to remove the "Last login" message from iTerm
+
+# Prevent Photos from opening every single time you plug in a device
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+
+# Increase bluetooth sound quality
+defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+
+# Display POSIX path in Finder
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# Don't write .DS_Store files to network drives
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+# Don't offer new disks for Time Machine backup
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
+# Config git
+git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+
+# Reset UI
+killall SystemUIServer
 
 echo "\n\n\n***************************************************\n*** Everything is ready. Enjoy your rocket Mac! ***\n***************************************************"
