@@ -34,6 +34,3 @@ source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 DEFAULT_USER="$USER"
 
 VIRTUAL_ENV_DISABLE_PROMPT=1
-
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
-ZSH_HIGHLIGHT_PATTERNS=('rm -rf *' 'fg=white,bold,bg=red')
