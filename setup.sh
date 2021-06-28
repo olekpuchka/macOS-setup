@@ -6,7 +6,7 @@ brew update # to make sure Homebrew is up to date
 brew doctor # to make sure your system is ready to brew
 
 echo "Installing brew tap/cask..."
-brew tap caskroom/cask
+brew tap homebrew/cask
 brew tap buo/cask-upgrade
 brew tap homebrew/cask-fonts
 
@@ -14,7 +14,7 @@ brew tap homebrew/cask-fonts
 brew install mas
 
 # Programming Languages
-brew cask install java
+brew install java
 brew install node
 
 # Dev Tools
@@ -22,7 +22,7 @@ brew install git
 brew install wget
 brew install tree
 brew install diff-so-fancy
-brew cask install iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
+brew install --cask iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
 brew install zsh
 chsh -s /usr/local/bin/zsh
 brew install zsh-syntax-highlighting
@@ -30,44 +30,43 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 brew install zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" # Install “Oh My ZSH”
-brew cask install sublime-text
-brew cask install visual-studio-code
-brew cask install sourcetree
-brew cask install postman
-brew cask install cyberduck
+brew install --cask sublime-text
+brew install --cask visual-studio-code
+brew install --cask sourcetree
+brew install --cask postman
+brew install --cask cyberduck
 
 # Communication Apps
-brew cask install slack
-brew cask install skype
-brew cask install whatsapp
-brew cask install telegram
+brew install --cask slack
+brew install --cask skype
+brew install --cask whatsapp
+brew install --cask telegram
 
 # Browsers
-brew cask install google-chrome
+brew install --cask google-chrome
 
 # Install/Signin App Store apps via mas
 # use mas search [appname] to find id's
 mas signin
 mas install 568494494 # Pocket
 mas install 904280696 # Things 3
-
+mas install 1320666476 # Wipr
 
 # Tools
-brew cask install gimp
-brew cask install the-unarchiver
-brew cask install vlc
-brew cask install 1password
-brew cask install appcleaner
-brew cask install dropbox
-brew cask install rectangle
-brew cask install alfred
-brew cask install latest
+brew install --cask the-unarchiver
+brew install --cask vlc
+brew install --cask 1password
+brew install --cask appcleaner
+brew install --cask dropbox
+brew install --cask rectangle
+brew install --cask alfred
+brew install --cask latest
 
 # Entertainment
-brew cask install spotify
+brew install --cask spotify
 
 #Fonts
-brew cask install font-hack
+brew install --cask font-hack
 
 git clone https://github.com/powerline/fonts.git
 cd fonts
