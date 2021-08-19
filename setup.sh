@@ -1,7 +1,9 @@
 #!/bin/sh
 
 echo "Installing brew..."
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+brew analytics off # this will prevent analytics from ever being sent
 brew update # to make sure Homebrew is up to date
 brew doctor # to make sure your system is ready to brew
 
@@ -25,11 +27,11 @@ brew install diff-so-fancy
 brew install --cask iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
 brew install zsh
 chsh -s /usr/local/bin/zsh
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" # Install “Oh My ZSH”
 brew install zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 brew install zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" # Install “Oh My ZSH”
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 brew install --cask sublime-text
 brew install --cask visual-studio-code
 brew install --cask sourcetree
@@ -51,6 +53,10 @@ mas signin
 mas install 568494494 # Pocket
 mas install 904280696 # Things 3
 mas install 1320666476 # Wipr
+mas install 409201541 # Pages
+mas install 409203825 # Numbers
+mas install 409183694 # Keynote
+mas install 497799835 # Xcode
 
 # Tools
 brew install --cask the-unarchiver
@@ -59,7 +65,6 @@ brew install --cask 1password
 brew install --cask appcleaner
 brew install --cask dropbox
 brew install --cask rectangle
-brew install --cask alfred
 brew install --cask latest
 
 # Entertainment
