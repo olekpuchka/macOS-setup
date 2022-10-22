@@ -23,7 +23,6 @@ brew install node
 brew install git
 brew install wget
 brew install tree
-brew install diff-so-fancy
 brew install --cask iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
 brew install zsh
 chsh -s /usr/local/bin/zsh
@@ -34,7 +33,6 @@ brew install zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 brew install --cask sublime-text
 brew install --cask visual-studio-code
-brew install --cask sourcetree
 brew install --cask postman
 brew install --cask cyberduck
 
@@ -43,29 +41,31 @@ brew install --cask slack
 brew install --cask skype
 brew install --cask whatsapp
 brew install --cask telegram
+brew install --cask zoom
 
 # Browsers
 brew install --cask google-chrome
 
 # Install/Signin App Store apps via mas
-# use mas search [appname] to find id's
+# use mas search [appname] to find the id
 mas signin
 mas install 568494494 # Pocket
 mas install 904280696 # Things 3
-mas install 1320666476 # Wipr
+mas install 441258766 # Magnet
 mas install 409201541 # Pages
 mas install 409203825 # Numbers
 mas install 409183694 # Keynote
+mas install 1018301773 # AdBlock Pro for Safari
 mas install 497799835 # Xcode
 
 # Tools
 brew install --cask the-unarchiver
-brew install --cask vlc
+brew install --cask iina
 brew install --cask 1password
 brew install --cask appcleaner
 brew install --cask dropbox
-brew install --cask rectangle
 brew install --cask latest
+brew install --cask surfshark
 
 # Entertainment
 brew install --cask spotify
