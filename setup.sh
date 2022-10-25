@@ -55,6 +55,7 @@ mas install 441258766 # Magnet
 mas install 409201541 # Pages
 mas install 409203825 # Numbers
 mas install 409183694 # Keynote
+mas install 1569813296 # 1Password for Safari
 mas install 1018301773 # AdBlock Pro for Safari
 mas install 497799835 # Xcode
 
@@ -70,8 +71,11 @@ brew install --cask surfshark
 # Entertainment
 brew install --cask spotify
 
-#Fonts
+# Fonts
 brew install --cask font-hack
+
+# Clean up brew installations and caches
+brew cleanup --prune=all
 
 git clone https://github.com/powerline/fonts.git
 cd fonts
@@ -97,6 +101,8 @@ defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 # Config git
+git config --global user.email "proxtreem@gmail.com"
+git config --global user.name "Oleksandr Puchka"
 git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
 # Reset UI
