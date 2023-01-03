@@ -38,7 +38,6 @@ brew install --cask cyberduck
 
 # Communication Apps
 brew install --cask slack
-brew install --cask skype
 brew install --cask whatsapp
 brew install --cask telegram
 brew install --cask zoom
