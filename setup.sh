@@ -40,7 +40,6 @@ brew install --cask cyberduck
 brew install --cask slack
 brew install --cask whatsapp
 brew install --cask telegram
-brew install --cask zoom
 
 # Browsers
 brew install --cask google-chrome
@@ -55,15 +54,12 @@ mas install 409201541 # Pages
 mas install 409203825 # Numbers
 mas install 409183694 # Keynote
 mas install 1569813296 # 1Password for Safari
-mas install 1018301773 # AdBlock Pro for Safari
-mas install 497799835 # Xcode
 
 # Tools
 brew install --cask the-unarchiver
-brew install --cask iina
 brew install --cask 1password
 brew install --cask appcleaner
-brew install --cask dropbox
+brew install --cask google-drive
 brew install --cask latest
 brew install --cask surfshark
 
