@@ -25,6 +25,7 @@ sh setup.sh
 
 ### Keyboard
 <img width="473" alt="image" src="https://github.com/oleksandrpuchka/macOS-setup/assets/4036980/739eab53-edad-4816-97b4-78ef988e3867">
+<img width="630" alt="image" src="https://github.com/oleksandrpuchka/macOS-setup/assets/4036980/ad3c7616-7dcf-418c-94e9-6890eb687326">
 
 #### Keyboard Shortcuts
 - Screenshots > Save picture of selected area as a file > ⇧⌘2
