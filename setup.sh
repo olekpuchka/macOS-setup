@@ -44,9 +44,8 @@ brew install --cask telegram
 # Browsers
 brew install --cask google-chrome
 
-# Install/Signin App Store apps via mas
+# Install App Store apps via mas
 # use mas search [appname] to find the id
-mas signin
 mas install 904280696 # Things 3
 mas install 441258766 # Magnet
 mas install 409201541 # Pages
