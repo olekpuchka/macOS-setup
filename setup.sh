@@ -1,32 +1,48 @@
 #!/bin/sh
 
-echo "Installing brew..."
+###############################################################################
+# brew and apps setup                                                         #
+###############################################################################
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-brew analytics off # this will prevent analytics from ever being sent
-brew update # to make sure Homebrew is up to date
-brew doctor # to make sure your system is ready to brew
+# Disable analytics
+brew analytics off
 
-echo "Installing brew tap/cask..."
+# Make sure we’re using the latest brew
+brew update
+
+# Make sure your system is ready to brew
+brew doctor
+
 brew tap homebrew/cask
 brew tap buo/cask-upgrade
 brew tap homebrew/cask-fonts
 
-# If some previously purchased software from the Mac App Store needs to be included
-brew install mas
+###############################################################################
+# Programming Languages                                                       #
+###############################################################################
 
-# Programming Languages
 brew install java
 brew install node
 
-# Dev Tools
+###############################################################################
+# Dev Tools                                                                   #
+###############################################################################
+
 brew install git
 brew install wget
 brew install tree
-brew install --cask iterm2 # plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
+
+# Plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
+brew install --cask iterm2
+
+# Remove the "Last login" message from iTerm
+touch .hushlogin
+
 brew install zsh
 chsh -s /usr/local/bin/zsh
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" # Install “Oh My ZSH”
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 brew install zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 brew install zsh-autosuggestions
@@ -36,69 +52,522 @@ brew install --cask visual-studio-code
 brew install --cask postman
 brew install --cask cyberduck
 
-# Communication Apps
+###############################################################################
+# Communication Apps                                                          #
+###############################################################################
+
 brew install --cask slack
 brew install --cask whatsapp
 brew install --cask telegram
 
-# Browsers
+###############################################################################
+# Browsers                                                                    #
+###############################################################################
+
 brew install --cask google-chrome
 
-# Install App Store apps via mas
-# use mas search [appname] to find the id
-mas install 904280696 # Things 3
-mas install 441258766 # Magnet
-mas install 409201541 # Pages
-mas install 409203825 # Numbers
-mas install 409183694 # Keynote
-mas install 1569813296 # 1Password for Safari
+###############################################################################
+# Tools                                                                       #
+###############################################################################
 
-# Tools
-brew install --cask the-unarchiver
 brew install --cask 1password
 brew install --cask appcleaner
 brew install --cask google-drive
 brew install --cask latest
 brew install --cask surfshark
 
-# Entertainment
+###############################################################################
+# Entertainment                                                               #
+###############################################################################
+
 brew install --cask spotify
 
-# Fonts
+###############################################################################
+# Fonts                                                                       #
+###############################################################################
+
 brew install --cask font-hack
-
-# Clean up brew installations and caches
-brew cleanup --prune=all
-
 git clone https://github.com/powerline/fonts.git
 cd fonts
 ./install.sh
 cd ..
 rm -rf fonts/
 
-touch .hushlogin # to remove the "Last login" message from iTerm
+###############################################################################
+# App Store apps                                                              #
+###############################################################################
 
-# Prevent Photos from opening every single time you plug in a device
-defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+brew install mas
 
-# Increase bluetooth sound quality
-defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+# Use `mas search APPNAME` to find the id
 
-# Display POSIX path in Finder
-defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+# Thigns 3
+mas install 904280696
 
-# Don't write .DS_Store files to network drives
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+# Magnet
+mas install 441258766
 
-# Don't offer new disks for Time Machine backup
-defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+# Pages
+mas install 409201541
 
-# Config git
+# Numbers
+mas install 409203825
+
+# Keynote
+mas install 409183694
+
+# 1Password for Safari
+mas install 1569813296
+
+###############################################################################
+# Git Config                                                                  #
+###############################################################################
+
 git config --global user.email "proxtreem@gmail.com"
 git config --global user.name "Oleksandr Puchka"
 git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
-# Reset UI
-killall SystemUIServer
+###############################################################################
+# MacOS System Settings                                                       #
+###############################################################################
 
-echo "\n\n\n***************************************************\n*** Everything is ready. Enjoy your rocket Mac! ***\n***************************************************"
+# Close System Settings window to prevent overriding
+osascript -e 'tell application "System Preferences" to quit'
+
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive sudo, update existing sudo time stamp until setup has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# Set computer name
+sudo scutil --set ComputerName "Olek's MacBook Pro"
+sudo scutil --set HostName "Olek's MacBook Pro"
+sudo scutil --set LocalHostName Oleks-MacBook-Pro
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "Olek's MacBook Pro"
+
+###############################################################################
+# Wi-Fi                                                                       #
+###############################################################################
+
+###############################################################################
+# BLuetooth                                                                   #
+###############################################################################
+
+# Increase sound quality for Bluetooth
+defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+
+###############################################################################
+# Network                                                                     #
+###############################################################################
+
+###############################################################################
+# VPN                                                                         #
+###############################################################################
+
+###############################################################################
+# Notifications                                                               #
+###############################################################################
+
+###############################################################################
+# Sound                                                                       #
+###############################################################################
+
+###############################################################################
+# Focus                                                                       #
+###############################################################################
+
+###############################################################################
+# Screen Time                                                                 #
+###############################################################################
+
+###############################################################################
+# General                                                                     #
+###############################################################################
+
+# Enable "Set time and date automatically"
+sudo systemsetup -setusingnetworktime on
+
+# Enable "24-hour time"
+defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
+
+# Enable "Set time zone automatically using your current location"
+sudo defaults write /Library/Preferences/com.apple.timezone.auto.plist Active -bool true
+
+# Increase window resize speed for Cocoa applications
+defaults write NSGlobalDomain NSWindowResizeTime -float 0.1
+
+# Disable the “Are you sure you want to open this application?” dialog
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+# Prevent Time Machine from prompting to use new hard drives as backup volume
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
+# Disable local Time Machine backups
+hash tmutil &> /dev/null && sudo tmutil disablelocal
+
+###############################################################################
+# Appearance                                                                  #
+###############################################################################
+
+# Show scroll bars "automatically based on mouse or trackpad"
+defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
+
+# Click in the scroll bar to "jump to the next page"
+defaults write -g AppleScrollerPagingBehavior -bool false
+
+# Expand save panel by default
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+
+###############################################################################
+# Accesibility                                                                #
+###############################################################################
+
+# Disable the "Shake mouse pointer to locate"
+sudo defaults write com.apple.universalaccess "closeView ShakeToShowCursor" -bool false
+
+###############################################################################
+# Control Center                                                              #
+###############################################################################
+
+###############################################################################
+# Siri & Spotlight                                                            #
+###############################################################################
+
+# Disble Ask Siri
+defaults write com.apple.assistant.support "Assistant Enabled" -bool false
+
+# Change indexing order and disable some search results
+defaults write com.apple.spotlight orderedItems -array \
+	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
+	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+	'{"enabled" = 1;"name" = "PDF";}' \
+  '{"enabled" = 1;"name" = "DOCUMENTS";}' \
+  '{"enabled" = 1;"name" = "CONTACT";}' \
+  '{"enabled" = 1;"name" = "MENU_WEBSEARCH";}' \
+  '{"enabled" = 0;"name" = "DIRECTORIES";}' \
+	'{"enabled" = 0;"name" = "FONTS";}' \
+	'{"enabled" = 0;"name" = "MESSAGES";}' \
+	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
+	'{"enabled" = 0;"name" = "IMAGES";}' \
+	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
+	'{"enabled" = 0;"name" = "MUSIC";}' \
+	'{"enabled" = 0;"name" = "MOVIES";}' \
+	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+	'{"enabled" = 0;"name" = "SOURCE";}' \
+	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
+	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
+	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
+	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
+	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+
+# Add a folder to Spotlight privacy settings
+sudo mdutil -i off "/Users/$USER/Projects"
+
+# Load new settings before rebuilding the index
+sudo killall mds > /dev/null 2>&1
+
+# Make sure indexing is enabled for the main volume
+sudo mdutil -i on / > /dev/null
+
+# Rebuild the index from scratch
+sudo mdutil -E / > /dev/null
+
+###############################################################################
+# Privacy & Security                                                          #
+###############################################################################
+
+###############################################################################
+# Desktop & Dock                                                              #
+###############################################################################
+
+# Set "Size"
+defaults write com.apple.dock "tilesize" -int "36"
+
+# Set "Magnification"
+defaults write com.apple.dock magnification -bool true
+
+# Set "Position on screen" to "bottom"
+defaults write com.apple.dock "orientation" -string "bottom"
+
+# Set "Minimize windows using" scale effect
+defaults write com.apple.dock "mineffect" -string "scale"
+
+# Enable "Minimize windows into application icon"
+defaults write com.apple.dock minimize-to-application -bool true
+
+# Enable "Automatically hide and show the Dock"
+defaults write com.apple.dock autohide -bool true
+
+# Enable "Show indicators for open applications"
+defaults write com.apple.dock show-process-indicators -bool true
+
+# Disable "Show suggested and recent apps in Dock"
+defaults write com.apple.dock show-recents -bool false
+
+# Set the top-left hot corner to none
+defaults write com.apple.dock wvous-tl-corner -int 0
+
+# Set the top-left hot corner to none
+defaults write com.apple.dock wvous-tr-corner -int 0
+
+# Set the bottom-left hot corner to none
+defaults write com.apple.dock wvous-bl-corner -int 0
+
+# Set the bottom-right hot corner to none
+defaults write com.apple.dock wvous-br-corner -int 0
+
+# Disable Stage Manager
+defaults write com.apple.WindowManager GloballyEnabled -bool false
+
+# Show hard disks on desktop
+defaults write com.apple.finder "ShowHardDrivesOnDesktop" -bool "true"
+
+# Enable "Group windows by application"
+defaults write com.apple.dock "expose-group-apps" -bool "true"
+
+###############################################################################
+# Displays                                                                    #
+###############################################################################
+
+# Enable font smoothing (anti-aliasing)
+defaults write -g CGFontRenderingFontSmoothingDisabled -bool FALSE
+defaults write NSGlobalDomain AppleFontSmoothing -int 1
+
+###############################################################################
+# Wallpaper                                                                   #
+###############################################################################
+
+###############################################################################
+# Screen Saver                                                                #
+###############################################################################
+
+###############################################################################
+# Battery                                                                     #
+###############################################################################
+
+# Set "Low Power Mode" to "Never"
+sudo pmset -a lowpowermode 0
+
+# Disable "Slighty dim the display on battery"
+sudo pmset -b lessbright 0
+
+# Disable "Prevent automatic sleeping on power adapter when the display is off"
+sudo pmset -c sleep 0
+
+# Set "Enable Power Nap" to "Only on Power Adapter"
+sudo pmset -c powernap 1
+
+# Set "Wake for network access" to "Only on Power Adapter"
+sudo pmset -c womp 1
+
+# Enable "Automatic graphics switching"
+sudo pmset -c gpuswitch 1
+
+# Disable "Optimize video streaming while on battery"
+sudo pmset -b gpuswitch 0
+
+# Enable lid wakeup
+sudo pmset -a lidwake 1
+
+###############################################################################
+# Lock Screen                                                                 #
+###############################################################################
+
+# Set "Start Screen Saver when inactive" to "For 5 minutes"
+defaults -currentHost write com.apple.screensaver idleTime -int 300
+
+# Set "Turn display off on batery when inactive" to "For 5 minutes"
+sudo pmset -b displaysleep 5
+
+# Set "Turn display off on power adapter when inactive" to "For 10 minutes"
+sudo pmset -c displaysleep 10
+
+# Set "Require password after screen saver begins or display is turned off" to "Immediately"
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# Set "Show large clock" to "On lock screen"
+defaults write com.apple.screensaver showClock -bool true
+
+# Enable "Show user name and photo"
+sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool true
+
+# Enable "Show the Sleep, Restart and Shut Down buttons"
+sudo defaults write /Library/Preferences/com.apple.loginwindow PowerOffDisabled -bool false
+
+###############################################################################
+# Touch ID & Password                                                         #
+###############################################################################
+
+###############################################################################
+# Users & Groups                                                              #
+###############################################################################
+
+###############################################################################
+# Passwords                                                                   #
+###############################################################################
+
+###############################################################################
+# Internet Accounts                                                           #
+###############################################################################
+
+###############################################################################
+# Game Center                                                                 #
+###############################################################################
+
+###############################################################################
+# Wallet & Apple Pay                                                          #
+###############################################################################
+
+###############################################################################
+# Keyboard                                                                    #
+###############################################################################
+
+# Set "Delay until repeat" to short
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# Set "Key repeat rate" to fast
+defaults write NSGlobalDomain KeyRepeat -int 1
+
+# Disable press-and-hold for keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Enable "Show input menu in menu bar"
+defaults write com.apple.TextInputMenu visible -bool true
+
+# Enable "Automatically switch to a document's input source"
+defaults write com.apple.HIToolbox AppleGlobalTextInputProperties -dict TextInputGlobalPropertyPerContextInput 1
+
+# Enable "Correct spelling automatically"
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool true
+
+# Disable "Capitalize words automatically"
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
+# Enable "Show inline predictive text"
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool true
+
+# Disable "Add period with double-space"
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+
+# Disable "Use smart quote and dashes"
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+# Enable "Use F1, F2, etc. keys as standard function keys"
+defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
+
+# Save screenshots in PNG format
+defaults write com.apple.screencapture "type" -string "png"
+
+# Set screenshots location to the Downloads folder
+defaults write com.apple.screencapture location -string "$HOME/Downloads"
+
+###############################################################################
+# Mouse                                                                       #
+###############################################################################
+
+###############################################################################
+# Trackpad                                                                    #
+###############################################################################
+
+# Enable "Secondary click"
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+
+# Enable "Tap to click"
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+
+# Enable "Natural scrolling"
+defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true
+
+###############################################################################
+# Mouse                                                                       #
+###############################################################################
+
+###############################################################################
+# Printers & Scanners                                                         #
+###############################################################################
+
+# Automatically quit printer app once the print jobs complete
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+
+# Display the full file path in windows
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Don't write .DS_Store files to network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# Prevent Photos from opening automatically when devices are plugged in
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+
+# Display full POSIX path as Finder window title
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# Set default view style as list view
+defaults write com.apple.finder "FXPreferredViewStyle" -string "Nlsv"
+
+# Set to automatically empty bin after 30 days
+defaults write com.apple.finder "FXRemoveOldTrashItems" -bool "true"
+
+###############################################################################
+# Mac App Store                                                               #
+###############################################################################
+
+# Enable the automatic update check
+defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+
+# Check for software updates daily
+defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
+
+# Download newly available updates in background
+defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
+
+# Install System data files & security updates
+defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
+
+# Turn on app auto-update
+defaults write com.apple.commerce AutoUpdate -bool true
+
+###############################################################################
+# Clean up brew installations and caches                                      #
+###############################################################################
+
+brew cleanup --prune=all
+
+###############################################################################
+# Reset affected applications                                                 #
+###############################################################################
+
+for app in "Activity Monitor" \
+    "Address Book" \
+    "Calendar" \
+    "cfprefsd" \
+    "Contacts" \
+    "Dock" \
+    "Finder" \
+    "Google Chrome" \
+    "Mail" \
+    "Messages" \
+    "Photos" \
+    "Safari" \
+    "SystemUIServer" \
+    "Terminal" \
+    "iCal"; do
+    killall "${app}" &>/dev/null
+done
+
+echo "\n\n\n
+###############################################################################
+# Everything is ready. Enjoy your powerfull MacBook Pro!                      #
+###############################################################################
+"
