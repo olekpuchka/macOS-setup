@@ -150,6 +150,12 @@ sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.serve
 # Wi-Fi                                                                       #
 ###############################################################################
 
+# Enable "Ask to join networks"
+defaults write com.apple.airport AskToJoinNetworks 1
+
+# Enable "Ask to join hotspots"
+defaults write com.apple.airport AskToJoinHotspots 1
+
 ###############################################################################
 # BLuetooth                                                                   #
 ###############################################################################
@@ -157,9 +163,16 @@ sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.serve
 # Increase sound quality for Bluetooth
 defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
 
+# Enable high-quality Bluetooth codecs AAC and AptX
+defaults write bluetoothaudiod "Enable AptX codec" -bool true
+defaults write bluetoothaudiod "Enable AAC codec" -bool true
+
 ###############################################################################
 # Network                                                                     #
 ###############################################################################
+
+# Enable "Firewall"
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
 
 ###############################################################################
 # VPN                                                                         #
@@ -172,6 +185,9 @@ defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int
 ###############################################################################
 # Sound                                                                       #
 ###############################################################################
+
+# Disable "Play sound on startup"
+sudo defaults write com.apple.systemsound com.apple.sound.beep.startup -int 0
 
 ###############################################################################
 # Focus                                                                       #
@@ -210,6 +226,12 @@ hash tmutil &> /dev/null && sudo tmutil disablelocal
 # Appearance                                                                  #
 ###############################################################################
 
+# Set "Appearance" to "Dark"
+defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+
+# Set "Accent color" to "Multicolor"
+defaults write NSGlobalDomain AppleAccentColor -int 6
+
 # Show scroll bars "automatically based on mouse or trackpad"
 defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
 
@@ -230,6 +252,45 @@ sudo defaults write com.apple.universalaccess "closeView ShakeToShowCursor" -boo
 ###############################################################################
 # Control Center                                                              #
 ###############################################################################
+
+# Set "Wi-Fi" to "Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible WiFi" -bool true
+
+# Set "Bluetooth" to "Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible Bluetooth" -bool true
+
+# Set "AirDrop" to "Don't Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible AirDrop" -bool false
+
+# Set "Focus" to "Show When Active"
+defaults write com.apple.controlcenter "NSStatusItem Visible DND" -bool true
+
+# Set "Stage Manager" to "Don't Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible StageManager" -bool false
+
+# Set "Display" to "Show When Active"
+defaults write com.apple.controlcenter "NSStatusItem Visible Display" -bool true
+
+# Set "Sound" to "Always Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible Sound" -bool true
+
+# Set "Now Playing " to "Show When Active"
+defaults write com.apple.controlcenter "NSStatusItem Visible NowPlaying" -bool true
+
+# Set "Battery" to "Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible Battery" -bool true
+
+# Set "Spotlight" to "Don't Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible Spotlight" -bool false
+
+# Set "Siri" to "Don't Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible Siri" -bool false
+
+# Set "Time Machine" to "Don't Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible TimeMachine" -bool false
+
+# Set "VPN" to "Don't Show in Menu Bar"
+defaults write com.apple.controlcenter "NSStatusItem Visible VPN" -bool false
 
 ###############################################################################
 # Siri & Spotlight                                                            #
@@ -279,6 +340,9 @@ sudo mdutil -E / > /dev/null
 # Privacy & Security                                                          #
 ###############################################################################
 
+# Disable Show location icon in Controll Centrer when System Services request your location
+sudo defaults write /Library/Preferences/com.apple.controlcenter.plist "NSStatusItem Visible LocationMenu" -bool false
+
 ###############################################################################
 # Desktop & Dock                                                              #
 ###############################################################################
@@ -306,6 +370,9 @@ defaults write com.apple.dock show-process-indicators -bool true
 
 # Disable "Show suggested and recent apps in Dock"
 defaults write com.apple.dock show-recents -bool false
+
+# Set "Default web browser" to "Google Chrome"
+defaults write com.apple.Safari "Default Browser" -string "com.google.Chrome"
 
 # Set the top-left hot corner to none
 defaults write com.apple.dock wvous-tl-corner -int 0
@@ -380,7 +447,7 @@ sudo pmset -a lidwake 1
 defaults -currentHost write com.apple.screensaver idleTime -int 300
 
 # Set "Turn display off on batery when inactive" to "For 5 minutes"
-sudo pmset -b displaysleep 5
+sudo pmset -b displaysleep 10
 
 # Set "Turn display off on power adapter when inactive" to "For 10 minutes"
 sudo pmset -c displaysleep 10
