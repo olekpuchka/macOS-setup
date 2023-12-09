@@ -76,7 +76,6 @@ brew install --cask google-chrome
 brew install --cask 1password
 brew install --cask appcleaner
 brew install --cask google-drive
-brew install --cask latest
 brew install --cask surfshark
 
 ###############################################################################
