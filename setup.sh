@@ -327,9 +327,6 @@ defaults write com.apple.spotlight orderedItems -array \
 	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
 	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 
-# Add a folder to Spotlight privacy settings
-sudo mdutil -i off "/Users/$USER/Projects"
-
 # Load new settings before rebuilding the index
 sudo killall mds > /dev/null 2>&1
 

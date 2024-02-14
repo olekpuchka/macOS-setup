@@ -19,5 +19,9 @@ sh setup.sh
 - Screenshots > Save picture of selected area as a file > ⇧⌘2
 - Screenshots > Copy picture of selected area to the clipboard > ⇧⌘1
 
+## Siri & Spotlight
+- Spotlight Privacy > Add `Projects` folder
+- Search Results Settings > Applications, Calculator, Contacts, Documents, Folders, PDF Documents, System Settings, Websites
+
 ## General
 - open 1Password > SSH > Apply Automatically the config
