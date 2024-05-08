@@ -15,7 +15,6 @@ brew update
 # Make sure your system is ready to brew
 brew doctor
 
-brew tap homebrew/cask
 brew tap buo/cask-upgrade
 brew tap homebrew/cask-fonts
 brew tap homebrew/autoupdate
@@ -41,7 +40,10 @@ brew install tree
 brew install --cask iterm2
 
 # Remove the "Last login" message from iTerm
-touch .hushlogin
+touch ~/.hushlogin
+
+# Create Projects folder
+mkdir -p ~/Projects
 
 brew install zsh
 chsh -s /usr/local/bin/zsh
@@ -221,9 +223,6 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
-
-# Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
 
 ###############################################################################
 # Appearance                                                                  #
