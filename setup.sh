@@ -493,7 +493,7 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow PowerOffDisabled 
 ###############################################################################
 
 # Set "Delay until repeat" to short
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
+defaults write NSGlobalDomain InitialKeyRepeat -int 25
 
 # Set "Key repeat rate" to fast
 defaults write NSGlobalDomain KeyRepeat -int 1
@@ -637,3 +637,4 @@ echo "\n\n\n
 # Everything is ready. Enjoy your powerfull MacBook Pro!                      #
 ###############################################################################
 "
+sudo shutdown -r now
