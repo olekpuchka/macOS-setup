@@ -23,5 +23,9 @@ sh setup.sh
 - Spotlight Privacy > Add `Projects` folder
 - Search Results Settings > Applications, Calculator, Contacts, Documents, Folders, PDF Documents, System Settings, Websites
 
+## iTerm
+- Import iterm2_profile.json
+- Update .zshrc config
+
 ## General
 - open 1Password > SSH > Apply Automatically the config
