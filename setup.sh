@@ -301,6 +301,9 @@ defaults write com.apple.controlcenter "NSStatusItem Visible VPN" -bool false
 # Disble Ask Siri
 defaults write com.apple.assistant.support "Assistant Enabled" -bool false
 
+# Disable Developer search results with fake Xcode app
+touch /Applications/Xcode.app
+
 # Change indexing order and disable some search results
 defaults write com.apple.spotlight orderedItems -array \
 	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
