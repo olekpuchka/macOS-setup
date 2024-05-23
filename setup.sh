@@ -16,7 +16,6 @@ brew update
 brew doctor
 
 brew tap buo/cask-upgrade
-brew tap homebrew/cask-fonts
 brew tap homebrew/autoupdate
 mkdir -p /Users/${USER}/Library/LaunchAgents
 brew autoupdate start 86400 --upgrade --greedy --cleanup
