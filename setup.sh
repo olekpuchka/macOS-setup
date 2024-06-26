@@ -6,6 +6,9 @@
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+# Add brew to the PATH
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+
 # Disable analytics
 brew analytics off
 
@@ -523,8 +526,8 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 # Disable "Use smart quote and dashes"
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
-# Enable "Use F1, F2, etc. keys as standard function keys"
-defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
+# Disable "Use F1, F2, etc. keys as standard function keys"
+defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
 
 # Save screenshots in PNG format
 defaults write com.apple.screencapture "type" -string "png"

@@ -12,7 +12,7 @@ sh setup.sh
 - brew update
 - brew upgrade
 - brew upgrade --cask --greedy
-- brew cleanup -—prune=all
+- brew cleanup --prune=all
 ```
 
 ## Keyboard Shortcuts
