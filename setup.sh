@@ -45,7 +45,7 @@ brew install --cask iterm2
 touch ~/.hushlogin
 
 # Create Projects folder
-mkdir -p ~/Projects
+mkdir -p ~/"💻 Projects"
 
 brew install zsh
 chsh -s /usr/local/bin/zsh
