@@ -45,7 +45,7 @@ brew install --cask iterm2
 touch ~/.hushlogin
 
 # Create Projects folder
-mkdir -p ~/"💻 Projects"
+mkdir -p ~/"Projects"
 
 brew install zsh
 chsh -s /usr/local/bin/zsh
@@ -130,7 +130,7 @@ mas install 1569813296
 ###############################################################################
 
 git config --global user.email "proxtreem@gmail.com"
-git config --global user.name "Oleksandr Puchka"
+git config --global user.name "Olek Puchka"
 git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
 ###############################################################################
