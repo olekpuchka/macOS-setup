@@ -110,15 +110,6 @@ brew install mas
 # Thigns 3
 mas install 904280696
 
-# Pages
-mas install 409201541
-
-# Numbers
-mas install 409203825
-
-# Keynote
-mas install 409183694
-
 # 1Password for Safari
 mas install 1569813296
 
@@ -228,9 +219,6 @@ defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 # Set "Appearance" to "Dark"
 defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
-
-# Set "Accent color" to "Multicolor"
-defaults write NSGlobalDomain AppleAccentColor -int 6
 
 # Show scroll bars "automatically based on mouse or trackpad"
 defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
@@ -611,6 +599,12 @@ defaults write com.apple.commerce AutoUpdate -bool true
 
 brew cleanup --prune=all
 
+echo "\n\n\n
+###############################################################################
+# Everything is ready. Enjoy your powerfull MacBook Pro!                      #
+###############################################################################
+"
+
 ###############################################################################
 # Reset affected applications                                                 #
 ###############################################################################
@@ -632,10 +626,3 @@ for app in "Activity Monitor" \
     "iCal"; do
     killall "${app}" &>/dev/null
 done
-
-echo "\n\n\n
-###############################################################################
-# Everything is ready. Enjoy your powerfull MacBook Pro!                      #
-###############################################################################
-"
-sudo shutdown -r now
