@@ -2,6 +2,9 @@
 
 Apps and brew setup for macOS environment
 
+## Oh My Zsh (.zshrc)
+- Copy `.zshrc` file config
+
 ## Run script
 ```
 sh setup.sh
@@ -20,12 +23,11 @@ sh setup.sh
 - Screenshots > Copy picture of selected area to the clipboard > ⇧⌘1
 
 ## Siri & Spotlight
-- Spotlight Privacy > Add `Projects` folder
 - Search Results Settings > Applications, Calculator, Contacts, Documents, Folders, PDF Documents, System Settings, Websites
+- Spotlight Privacy > Add `Projects` folder
 
 ## iTerm
 - Import iterm2_profile.json
-- Update .zshrc config
 
 ## General
 - open 1Password > SSH > Apply Automatically the config
