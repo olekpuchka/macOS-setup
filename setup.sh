@@ -110,9 +110,6 @@ brew install mas
 # Thigns 3
 mas install 904280696
 
-# Magnet
-mas install 441258766
-
 # Pages
 mas install 409201541
 
