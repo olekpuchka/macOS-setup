@@ -65,6 +65,7 @@ brew install --cask cyberduck
 brew install --cask slack
 brew install --cask whatsapp
 brew install --cask telegram
+brew install --cask signal
 
 ###############################################################################
 # Browsers                                                                    #
@@ -81,6 +82,7 @@ brew install --cask appcleaner
 brew install --cask google-drive
 brew install --cask surfshark
 brew install --cask logi-options-plus
+brew install --cask chatgpt
 
 ###############################################################################
 # Entertainment                                                               #
@@ -292,28 +294,28 @@ touch /Applications/Xcode.app
 
 # Change indexing order and disable some search results
 defaults write com.apple.spotlight orderedItems -array \
-	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
-	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
-	'{"enabled" = 1;"name" = "PDF";}' \
-  '{"enabled" = 1;"name" = "DOCUMENTS";}' \
-  '{"enabled" = 1;"name" = "CONTACT";}' \
-  '{"enabled" = 1;"name" = "MENU_WEBSEARCH";}' \
-  '{"enabled" = 0;"name" = "DIRECTORIES";}' \
-	'{"enabled" = 0;"name" = "FONTS";}' \
-	'{"enabled" = 0;"name" = "MESSAGES";}' \
-	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
-	'{"enabled" = 0;"name" = "IMAGES";}' \
-	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
-	'{"enabled" = 0;"name" = "MUSIC";}' \
-	'{"enabled" = 0;"name" = "MOVIES";}' \
-	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
-	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
-	'{"enabled" = 0;"name" = "SOURCE";}' \
-	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
-	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
-	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
-	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
-	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+  '{"enabled" = 1; "name" = "APPLICATIONS";}' \
+  '{"enabled" = 1; "name" = "MENU_EXPRESSION";}' \
+  '{"enabled" = 1; "name" = "CONTACT";}' \
+  '{"enabled" = 0; "name" = "MENU_CONVERSION";}' \
+  '{"enabled" = 0; "name" = "MENU_DEFINITION";}' \
+  '{"enabled" = 0; "name" = "SOURCE";}' \
+  '{"enabled" = 1; "name" = "DOCUMENTS";}' \
+  '{"enabled" = 0; "name" = "EVENT_TODO";}' \
+  '{"enabled" = 1; "name" = "DIRECTORIES";}' \
+  '{"enabled" = 0; "name" = "FONTS";}' \
+  '{"enabled" = 0; "name" = "IMAGES";}' \
+  '{"enabled" = 0; "name" = "MESSAGES";}' \
+  '{"enabled" = 0; "name" = "MOVIES";}' \
+  '{"enabled" = 0; "name" = "MUSIC";}' \
+  '{"enabled" = 0; "name" = "MENU_OTHER";}' \
+  '{"enabled" = 1; "name" = "PDF";}' \
+  '{"enabled" = 0; "name" = "PRESENTATIONS";}' \
+  '{"enabled" = 0; "name" = "MENU_SPOTLIGHT_SUGGESTIONS";}' \
+  '{"enabled" = 0; "name" = "SPREADSHEETS";}' \
+  '{"enabled" = 1; "name" = "SYSTEM_PREFS";}' \
+  '{"enabled" = 0; "name" = "TIPS";}' \
+  '{"enabled" = 1; "name" = "BOOKMARKS";}'
 
 # Load new settings before rebuilding the index
 sudo killall mds > /dev/null 2>&1
@@ -336,10 +338,11 @@ sudo defaults write /Library/Preferences/com.apple.controlcenter.plist "NSStatus
 ###############################################################################
 
 # Set "Size"
-defaults write com.apple.dock "tilesize" -int "36"
+defaults write com.apple.dock "tilesize" -int 31
 
 # Set "Magnification"
 defaults write com.apple.dock magnification -bool true
+defaults write com.apple.dock largesize -int 42
 
 # Set "Position on screen" to "bottom"
 defaults write com.apple.dock "orientation" -string "bottom"
@@ -378,10 +381,10 @@ defaults write com.apple.dock wvous-br-corner -int 0
 defaults write com.apple.WindowManager GloballyEnabled -bool false
 
 # Show hard disks on desktop
-defaults write com.apple.finder "ShowHardDrivesOnDesktop" -bool "true"
+defaults write com.apple.finder "ShowHardDrivesOnDesktop" -bool true
 
 # Enable "Group windows by application"
-defaults write com.apple.dock "expose-group-apps" -bool "true"
+defaults write com.apple.dock "expose-group-apps" -bool true
 
 ###############################################################################
 # Displays                                                                    #
