@@ -65,7 +65,6 @@ brew install --cask cyberduck
 brew install --cask slack
 brew install --cask whatsapp
 brew install --cask telegram
-brew install --cask signal
 
 ###############################################################################
 # Browsers                                                                    #
