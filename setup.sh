@@ -56,7 +56,6 @@ brew install zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 brew install --cask visual-studio-code
 brew install --cask postman
-brew install --cask cyberduck
 
 ###############################################################################
 # Communication Apps                                                          #
