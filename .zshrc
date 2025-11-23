@@ -26,8 +26,6 @@ fi
 }
 base_prompt='%{$fg[cyan]%}%0~%{$reset_color%}%{$fg[red]%}|%{$reset_color%}'
 
-source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
 DEFAULT_USER="$USER"
 
 VIRTUAL_ENV_DISABLE_PROMPT=1

@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 ###############################################################################
 # brew and apps setup                                                         #
@@ -92,11 +93,12 @@ brew install --cask spotify
 ###############################################################################
 
 brew install --cask font-hack
+rm -rf fonts
 git clone https://github.com/powerline/fonts.git
 cd fonts
 ./install.sh
 cd ..
-rm -rf fonts/
+rm -rf fonts
 
 ###############################################################################
 # App Store apps                                                              #
@@ -106,7 +108,7 @@ brew install mas
 
 # Use `mas search APPNAME` to find the id
 
-# Thigns 3
+# Things 3
 mas install 904280696
 
 ###############################################################################
