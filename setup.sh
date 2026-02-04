@@ -79,7 +79,6 @@ brew install --cask 1password
 brew install --cask pearcleaner
 brew install --cask surfshark
 brew install --cask logi-options-plus
-brew install --cask chatgpt
 
 ###############################################################################
 # Entertainment                                                               #
