@@ -90,7 +90,7 @@ brew install --cask spotify
 # Fonts                                                                       #
 ###############################################################################
 
-brew install --cask font-hack
+brew install --cask font-monaspace
 rm -rf fonts
 git clone https://github.com/powerline/fonts.git
 cd fonts
