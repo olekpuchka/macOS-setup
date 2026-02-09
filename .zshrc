@@ -6,7 +6,7 @@ ZSH_THEME="agnoster"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
-# Custom plugins may be added to ~/.oh-my-zsh/custom/pluginphos/
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
@@ -15,6 +15,8 @@ plugins=(
  zsh-autosuggestions
  zsh-syntax-highlighting
 )
+
+VIRTUAL_ENV_DISABLE_PROMPT=1
 
 source $ZSH/oh-my-zsh.sh
 
@@ -27,5 +29,3 @@ fi
 base_prompt='%{$fg[cyan]%}%0~%{$reset_color%}%{$fg[red]%}|%{$reset_color%}'
 
 DEFAULT_USER="$USER"
-
-VIRTUAL_ENV_DISABLE_PROMPT=1

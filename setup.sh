@@ -1,14 +1,24 @@
 #!/bin/sh
 set -e
 
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive sudo, update existing sudo time stamp until setup has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 ###############################################################################
 # brew and apps setup                                                         #
 ###############################################################################
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+if ! command -v brew &>/dev/null; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 # Add brew to the PATH
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+grep -q 'brew shellenv' ~/.zprofile 2>/dev/null || \
+  (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Disable analytics
 brew analytics off
@@ -17,30 +27,13 @@ brew analytics off
 brew update
 
 # Make sure your system is ready to brew
-brew doctor
+brew doctor || true
 
-brew tap buo/cask-upgrade
-brew tap homebrew/autoupdate
-mkdir -p /Users/${USER}/Library/LaunchAgents
+# Install all formulae, casks, and App Store apps from Brewfile
+brew bundle --file="$(cd "$(dirname "$0")" && pwd)/Brewfile"
+
+mkdir -p "$HOME/Library/LaunchAgents"
 brew autoupdate start 86400 --upgrade --greedy --cleanup
-
-###############################################################################
-# Programming Languages                                                       #
-###############################################################################
-
-brew install java
-brew install node
-
-###############################################################################
-# Dev Tools                                                                   #
-###############################################################################
-
-brew install git
-brew install wget
-brew install tree
-
-# Plugins, templates, themes, etc. at: https://github.com/robbyrussell/oh-my-zsh
-brew install --cask iterm2
 
 # Remove the "Last login" message from iTerm
 touch ~/.hushlogin
@@ -48,66 +41,61 @@ touch ~/.hushlogin
 # Create Projects folder
 mkdir -p ~/"Projects"
 
-brew install zsh
-chsh -s /usr/local/bin/zsh
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-brew install zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-brew install zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-brew install --cask visual-studio-code
+# Exclude Projects folder from Spotlight indexing
+touch ~/Projects/.metadata_never_index
 
-###############################################################################
-# Communication Apps                                                          #
-###############################################################################
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+[ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ] || \
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+[ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ] || \
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
-brew install --cask slack
-brew install --cask whatsapp
-brew install --cask telegram
+# Copy .zshrc config
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"
 
-###############################################################################
-# Browsers                                                                    #
-###############################################################################
+# Import iTerm2 profile via Dynamic Profiles
+mkdir -p "$HOME/Library/Application Support/iTerm2/DynamicProfiles"
+echo '{"Profiles":['"$(cat "$SCRIPT_DIR/iterm2_profile.json")"']}' \
+  > "$HOME/Library/Application Support/iTerm2/DynamicProfiles/profile.json"
 
-brew install --cask google-chrome
-
-###############################################################################
-# Tools                                                                       #
-###############################################################################
-
-brew install --cask 1password
-brew install --cask pearcleaner
-brew install --cask surfshark
-brew install --cask logi-options-plus
-
-###############################################################################
-# Entertainment                                                               #
-###############################################################################
-
-brew install --cask spotify
+# Set imported profile as the default iTerm2 profile
+defaults write com.googlecode.iterm2 "Default Bookmark Guid" -string "E6877978-AAD6-4B58-AB11-9F4F0029D97C"
 
 ###############################################################################
 # Fonts                                                                       #
 ###############################################################################
 
-brew install --cask font-monaspace
-rm -rf fonts
-git clone https://github.com/powerline/fonts.git
-cd fonts
-./install.sh
-cd ..
-rm -rf fonts
+rm -rf /tmp/powerline-fonts
+git clone --depth=1 https://github.com/powerline/fonts.git /tmp/powerline-fonts
+/tmp/powerline-fonts/install.sh
+rm -rf /tmp/powerline-fonts
 
 ###############################################################################
-# App Store apps                                                              #
+# 1Password SSH Agent                                                         #
 ###############################################################################
 
-brew install mas
+mkdir -p "$HOME/.ssh"
+if [ ! -f "$HOME/.ssh/config" ] || ! grep -q '1password' "$HOME/.ssh/config" 2>/dev/null; then
+  cat >> "$HOME/.ssh/config" <<'EOF'
 
-# Use `mas search APPNAME` to find the id
+# 1Password SSH Agent
+Host *
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+EOF
+  chmod 600 "$HOME/.ssh/config"
+fi
 
-# Things 3
-mas install 904280696
+###############################################################################
+# Touch ID for sudo                                                           #
+###############################################################################
+
+if [ -f /etc/pam.d/sudo_local.template ] && [ ! -f /etc/pam.d/sudo_local ]; then
+  sudo cp /etc/pam.d/sudo_local.template /etc/pam.d/sudo_local
+  sudo sed -i '' 's/^#auth/auth/' /etc/pam.d/sudo_local
+fi
 
 ###############################################################################
 # Git Config                                                                  #
@@ -117,18 +105,18 @@ git config --global user.email "proxtreem@gmail.com"
 git config --global user.name "Olek Puchka"
 git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
+# Sign commits with SSH key via 1Password
+git config --global gpg.format ssh
+git config --global commit.gpgsign true
+git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+git config --global user.signingkey "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAfMxjk8hwQLr8kvgtB2EMSVF6g9kfNyGnLFFaEXa2g"
+
 ###############################################################################
 # MacOS System Settings                                                       #
 ###############################################################################
 
 # Close System Settings window to prevent overriding
-osascript -e 'tell application "System Preferences" to quit'
-
-# Ask for the administrator password upfront
-sudo -v
-
-# Keep-alive sudo, update existing sudo time stamp until setup has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+osascript -e 'tell application "System Settings" to quit'
 
 # Set computer name
 sudo scutil --set ComputerName "Olek's MacBook Pro"
@@ -147,7 +135,7 @@ defaults write com.apple.airport AskToJoinNetworks 1
 defaults write com.apple.airport AskToJoinHotspots 1
 
 ###############################################################################
-# BLuetooth                                                                   #
+# Bluetooth                                                                   #
 ###############################################################################
 
 # Increase sound quality for Bluetooth
@@ -165,27 +153,11 @@ defaults write bluetoothaudiod "Enable AAC codec" -bool true
 sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
 
 ###############################################################################
-# VPN                                                                         #
-###############################################################################
-
-###############################################################################
-# Notifications                                                               #
-###############################################################################
-
-###############################################################################
 # Sound                                                                       #
 ###############################################################################
 
 # Disable "Play sound on startup"
 sudo defaults write com.apple.systemsound com.apple.sound.beep.startup -int 0
-
-###############################################################################
-# Focus                                                                       #
-###############################################################################
-
-###############################################################################
-# Screen Time                                                                 #
-###############################################################################
 
 ###############################################################################
 # General                                                                     #
@@ -227,7 +199,7 @@ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 
 ###############################################################################
-# Accesibility                                                                #
+# Accessibility                                                               #
 ###############################################################################
 
 # Disable the "Shake mouse pointer to locate"
@@ -280,11 +252,11 @@ defaults write com.apple.controlcenter "NSStatusItem Visible VPN" -bool false
 # Siri & Spotlight                                                            #
 ###############################################################################
 
-# Disble Ask Siri
+# Disable Ask Siri
 defaults write com.apple.assistant.support "Assistant Enabled" -bool false
 
 # Disable Developer search results with fake Xcode app
-touch /Applications/Xcode.app
+mkdir -p /Applications/Xcode.app
 
 # Change indexing order and disable some search results
 defaults write com.apple.spotlight orderedItems -array \
@@ -324,7 +296,7 @@ sudo mdutil -E / > /dev/null
 # Privacy & Security                                                          #
 ###############################################################################
 
-# Disable Show location icon in Controll Centrer when System Services request your location
+# Disable Show location icon in Control Center when System Services request your location
 sudo defaults write /Library/Preferences/com.apple.controlcenter.plist "NSStatusItem Visible LocationMenu" -bool false
 
 ###############################################################################
@@ -362,7 +334,7 @@ defaults write com.apple.Safari "Default Browser" -string "com.google.Chrome"
 # Set the top-left hot corner to none
 defaults write com.apple.dock wvous-tl-corner -int 0
 
-# Set the top-left hot corner to none
+# Set the top-right hot corner to none
 defaults write com.apple.dock wvous-tr-corner -int 0
 
 # Set the bottom-left hot corner to none
@@ -371,8 +343,23 @@ defaults write com.apple.dock wvous-bl-corner -int 0
 # Set the bottom-right hot corner to none
 defaults write com.apple.dock wvous-br-corner -int 0
 
+# Set "Window title bar double-click action" to "Zoom"
+defaults write NSGlobalDomain AppleActionOnDoubleClick -string "Maximize"
+
+# Enable "Animate opening applications"
+defaults write com.apple.dock launchanim -bool true
+
 # Disable Stage Manager
 defaults write com.apple.WindowManager GloballyEnabled -bool false
+
+# Disable "Show recent apps in Stage Manager"
+defaults write com.apple.WindowManager AppWindowGroupingBehavior -bool false
+
+# Set "Click wallpaper to show desktop" to "Only in Stage Manager"
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
+# Set "Show windows from an application" to "All at Once"
+defaults write com.apple.dock showAppExposeGestureEnabled -bool true
 
 # Show hard disks on desktop
 defaults write com.apple.finder "ShowHardDrivesOnDesktop" -bool true
@@ -389,21 +376,13 @@ defaults write -g CGFontRenderingFontSmoothingDisabled -bool FALSE
 defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
 ###############################################################################
-# Wallpaper                                                                   #
-###############################################################################
-
-###############################################################################
-# Screen Saver                                                                #
-###############################################################################
-
-###############################################################################
 # Battery                                                                     #
 ###############################################################################
 
 # Set "Low Power Mode" to "Never"
 sudo pmset -a lowpowermode 0
 
-# Disable "Slighty dim the display on battery"
+# Disable "Slightly dim the display on battery"
 sudo pmset -b lessbright 0
 
 # Disable "Prevent automatic sleeping on power adapter when the display is off"
@@ -431,7 +410,7 @@ sudo pmset -a lidwake 1
 # Set "Start Screen Saver when inactive" to "For 5 minutes"
 defaults -currentHost write com.apple.screensaver idleTime -int 300
 
-# Set "Turn display off on batery when inactive" to "For 5 minutes"
+# Set "Turn display off on battery when inactive" to "For 10 minutes"
 sudo pmset -b displaysleep 10
 
 # Set "Turn display off on power adapter when inactive" to "For 10 minutes"
@@ -449,30 +428,6 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -boo
 
 # Enable "Show the Sleep, Restart and Shut Down buttons"
 sudo defaults write /Library/Preferences/com.apple.loginwindow PowerOffDisabled -bool false
-
-###############################################################################
-# Touch ID & Password                                                         #
-###############################################################################
-
-###############################################################################
-# Users & Groups                                                              #
-###############################################################################
-
-###############################################################################
-# Passwords                                                                   #
-###############################################################################
-
-###############################################################################
-# Internet Accounts                                                           #
-###############################################################################
-
-###############################################################################
-# Game Center                                                                 #
-###############################################################################
-
-###############################################################################
-# Wallet & Apple Pay                                                          #
-###############################################################################
 
 ###############################################################################
 # Keyboard                                                                    #
@@ -499,13 +454,13 @@ defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool true
 # Disable "Capitalize words automatically"
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 
-# Enable "Show inline predictive text"
+# Enable "Add period with double-space"
 defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool true
 
-# Disable "Add period with double-space"
+# Disable "Use smart dashes"
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
-# Disable "Use smart quote and dashes"
+# Disable "Use smart quotes"
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
 # Disable "Use F1, F2, etc. keys as standard function keys"
@@ -516,10 +471,6 @@ defaults write com.apple.screencapture "type" -string "png"
 
 # Set screenshots location to the Downloads folder
 defaults write com.apple.screencapture location -string "$HOME/Downloads"
-
-###############################################################################
-# Mouse                                                                       #
-###############################################################################
 
 ###############################################################################
 # Trackpad                                                                    #
@@ -533,10 +484,6 @@ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 
 # Enable "Natural scrolling"
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true
-
-###############################################################################
-# Mouse                                                                       #
-###############################################################################
 
 ###############################################################################
 # Printers & Scanners                                                         #
@@ -591,16 +538,38 @@ defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 defaults write com.apple.commerce AutoUpdate -bool true
 
 ###############################################################################
+# Dock Layout                                                                 #
+###############################################################################
+
+if command -v dockutil &>/dev/null; then
+  dockutil --remove all --no-restart
+  dockutil --add /Applications/Google\ Chrome.app --no-restart
+  dockutil --add /System/Applications/Mail.app --no-restart
+  dockutil --add /System/Applications/Calendar.app --no-restart
+  dockutil --add /Applications/Things3.app --no-restart
+  dockutil --add /System/Applications/Notes.app --no-restart
+  dockutil --add /Applications/1Password.app --no-restart
+  dockutil --add /Applications/Visual\ Studio\ Code.app --no-restart
+  dockutil --add /System/Applications/Apps.app --no-restart
+  # Add Downloads folder as a stack: sorted by Date Modified, displayed as Stack, viewed as Grid
+  dockutil --add "$HOME/Downloads" --sort datemodified --display stack --view grid --no-restart
+fi
+
+###############################################################################
+# Keyboard Shortcuts                                                          #
+###############################################################################
+
+# Save picture of selected area as a file: ⇧⌘2
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 31 '{ enabled = 1; value = { parameters = (50, 19, 1179648); type = standard; }; }'
+
+# Copy picture of selected area to the clipboard: ⇧⌘1
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 29 '{ enabled = 1; value = { parameters = (49, 18, 1179648); type = standard; }; }'
+
+###############################################################################
 # Clean up brew installations and caches                                      #
 ###############################################################################
 
 brew cleanup --prune=all
-
-echo "\n\n\n
-###############################################################################
-# Everything is ready. Enjoy your powerfull MacBook Pro!                      #
-###############################################################################
-"
 
 ###############################################################################
 # Reset affected applications                                                 #
@@ -619,7 +588,19 @@ for app in "Activity Monitor" \
     "Photos" \
     "Safari" \
     "SystemUIServer" \
-    "Terminal" \
     "iCal"; do
     killall "${app}" &>/dev/null
 done
+
+echo "\n\n\n
+###############################################################################
+# Everything is ready. Enjoy your powerful MacBook Pro!                        #
+# A restart is recommended to apply all changes.                              #
+###############################################################################
+"
+
+printf "Restart now? (y/n) "
+read -r REPLY
+if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
+  sudo shutdown -r now
+fi
