@@ -1,9 +1,5 @@
-# Taps
-tap "buo/cask-upgrade"
-tap "homebrew/autoupdate"
-
 # Programming Languages
-brew "node"
+brew "nvm"
 
 # Dev Tools
 brew "git"
@@ -14,12 +10,16 @@ brew "diff-so-fancy"
 # Dock management
 brew "dockutil"
 
+# Set the default browser from the CLI
+brew "defaultbrowser"
+
 # Mac App Store CLI
 brew "mas"
 
 # Cask Apps - Dev Tools
-cask "iterm2"
+cask "ghostty"
 cask "visual-studio-code"
+cask "claude-code"
 
 # Cask Apps - Communication
 cask "slack"
@@ -31,6 +31,7 @@ cask "google-chrome"
 
 # Cask Apps - Tools
 cask "1password"
+cask "claude"
 cask "pearcleaner"
 cask "surfshark"
 cask "logi-options-plus"

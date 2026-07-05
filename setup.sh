@@ -11,7 +11,7 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # brew and apps setup                                                         #
 ###############################################################################
 
-if ! command -v brew &>/dev/null; then
+if ! command -v brew >/dev/null 2>&1; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
@@ -30,12 +30,11 @@ brew update
 brew doctor || true
 
 # Install all formulae, casks, and App Store apps from Brewfile
-brew bundle --file="$(cd "$(dirname "$0")" && pwd)/Brewfile"
+# (don't abort the whole setup if e.g. mas apps fail because the App Store isn't signed in)
+brew bundle --file="$(cd "$(dirname "$0")" && pwd)/Brewfile" || \
+  echo "⚠️  brew bundle reported failures (App Store not signed in for mas apps?) — continuing"
 
-mkdir -p "$HOME/Library/LaunchAgents"
-brew autoupdate start 86400 --upgrade --greedy --cleanup
-
-# Remove the "Last login" message from iTerm
+# Remove the "Last login" message from the terminal
 touch ~/.hushlogin
 
 # Create Projects folder
@@ -56,22 +55,14 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"
 
-# Import iTerm2 profile via Dynamic Profiles
-mkdir -p "$HOME/Library/Application Support/iTerm2/DynamicProfiles"
-echo '{"Profiles":['"$(cat "$SCRIPT_DIR/iterm2_profile.json")"']}' \
-  > "$HOME/Library/Application Support/iTerm2/DynamicProfiles/profile.json"
+# nvm: create working dir and install the latest LTS Node
+mkdir -p "$HOME/.nvm"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && \. "$(brew --prefix)/opt/nvm/nvm.sh" && nvm install --lts || true
 
-# Set imported profile as the default iTerm2 profile
-defaults write com.googlecode.iterm2 "Default Bookmark Guid" -string "E6877978-AAD6-4B58-AB11-9F4F0029D97C"
-
-###############################################################################
-# Fonts                                                                       #
-###############################################################################
-
-rm -rf /tmp/powerline-fonts
-git clone --depth=1 https://github.com/powerline/fonts.git /tmp/powerline-fonts
-/tmp/powerline-fonts/install.sh
-rm -rf /tmp/powerline-fonts
+# Restore Ghostty config
+mkdir -p "$HOME/.config/ghostty"
+cp "$SCRIPT_DIR/ghostty.config" "$HOME/.config/ghostty/config"
 
 ###############################################################################
 # 1Password SSH Agent                                                         #
@@ -101,7 +92,7 @@ fi
 # Git Config                                                                  #
 ###############################################################################
 
-git config --global user.email "proxtreem@gmail.com"
+git config --global user.email "o.s.puchka@gmail.com"
 git config --global user.name "Olek Puchka"
 git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
@@ -120,7 +111,7 @@ osascript -e 'tell application "System Settings" to quit'
 
 # Set computer name
 sudo scutil --set ComputerName "Olek's MacBook Pro"
-sudo scutil --set HostName "Olek's MacBook Pro"
+sudo scutil --set HostName "Olek-MacBook-Pro"
 sudo scutil --set LocalHostName Olek-MacBook-Pro
 sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "Olek's MacBook Pro"
 
@@ -135,29 +126,18 @@ defaults write com.apple.airport AskToJoinNetworks 1
 defaults write com.apple.airport AskToJoinHotspots 1
 
 ###############################################################################
-# Bluetooth                                                                   #
-###############################################################################
-
-# Increase sound quality for Bluetooth
-defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
-
-# Enable high-quality Bluetooth codecs AAC and AptX
-defaults write bluetoothaudiod "Enable AptX codec" -bool true
-defaults write bluetoothaudiod "Enable AAC codec" -bool true
-
-###############################################################################
 # Network                                                                     #
 ###############################################################################
 
 # Enable "Firewall"
-sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 
 ###############################################################################
 # Sound                                                                       #
 ###############################################################################
 
 # Disable "Play sound on startup"
-sudo defaults write com.apple.systemsound com.apple.sound.beep.startup -int 0
+sudo nvram StartupMute=%01
 
 ###############################################################################
 # General                                                                     #
@@ -174,9 +154,6 @@ sudo defaults write /Library/Preferences/com.apple.timezone.auto.plist Active -b
 
 # Increase window resize speed for Cocoa applications
 defaults write NSGlobalDomain NSWindowResizeTime -float 0.1
-
-# Disable the “Are you sure you want to open this application?” dialog
-defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
@@ -197,13 +174,6 @@ defaults write -g AppleScrollerPagingBehavior -bool false
 # Expand save panel by default
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
-
-###############################################################################
-# Accessibility                                                               #
-###############################################################################
-
-# Disable the "Shake mouse pointer to locate"
-sudo defaults write com.apple.universalaccess "closeView ShakeToShowCursor" -bool false
 
 ###############################################################################
 # Control Center                                                              #
@@ -254,9 +224,6 @@ defaults write com.apple.controlcenter "NSStatusItem Visible VPN" -bool false
 
 # Disable Ask Siri
 defaults write com.apple.assistant.support "Assistant Enabled" -bool false
-
-# Disable Developer search results with fake Xcode app
-mkdir -p /Applications/Xcode.app
 
 # Change indexing order and disable some search results
 defaults write com.apple.spotlight orderedItems -array \
@@ -328,8 +295,8 @@ defaults write com.apple.dock show-process-indicators -bool true
 # Disable "Show suggested and recent apps in Dock"
 defaults write com.apple.dock show-recents -bool false
 
-# Set "Default web browser" to "Google Chrome"
-defaults write com.apple.Safari "Default Browser" -string "com.google.Chrome"
+# Set "Default web browser" to "Google Chrome" (macOS shows a confirmation dialog)
+command -v defaultbrowser >/dev/null 2>&1 && defaultbrowser chrome || true
 
 # Set the top-left hot corner to none
 defaults write com.apple.dock wvous-tl-corner -int 0
@@ -385,7 +352,7 @@ sudo pmset -a lowpowermode 0
 # Disable "Slightly dim the display on battery"
 sudo pmset -b lessbright 0
 
-# Disable "Prevent automatic sleeping on power adapter when the display is off"
+# Never go to sleep on power adapter (display can still sleep)
 sudo pmset -c sleep 0
 
 # Set "Enable Power Nap" to "Only on Power Adapter"
@@ -416,10 +383,6 @@ sudo pmset -b displaysleep 10
 # Set "Turn display off on power adapter when inactive" to "For 10 minutes"
 sudo pmset -c displaysleep 10
 
-# Set "Require password after screen saver begins or display is turned off" to "Immediately"
-defaults write com.apple.screensaver askForPassword -int 1
-defaults write com.apple.screensaver askForPasswordDelay -int 0
-
 # Set "Show large clock" to "On lock screen"
 defaults write com.apple.screensaver showClock -bool true
 
@@ -428,6 +391,9 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -boo
 
 # Enable "Show the Sleep, Restart and Shut Down buttons"
 sudo defaults write /Library/Preferences/com.apple.loginwindow PowerOffDisabled -bool false
+
+# Disable the Guest account
+sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
 
 ###############################################################################
 # Keyboard                                                                    #
@@ -541,7 +507,7 @@ defaults write com.apple.commerce AutoUpdate -bool true
 # Dock Layout                                                                 #
 ###############################################################################
 
-if command -v dockutil &>/dev/null; then
+if command -v dockutil >/dev/null 2>&1; then
   dockutil --remove all --no-restart
   dockutil --add /Applications/Google\ Chrome.app --no-restart
   dockutil --add /System/Applications/Mail.app --no-restart
@@ -549,6 +515,7 @@ if command -v dockutil &>/dev/null; then
   dockutil --add /Applications/Things3.app --no-restart
   dockutil --add /System/Applications/Notes.app --no-restart
   dockutil --add /Applications/1Password.app --no-restart
+  dockutil --add /Applications/Claude.app --no-restart
   dockutil --add /Applications/Visual\ Studio\ Code.app --no-restart
   dockutil --add /System/Applications/Apps.app --no-restart
   # Add Downloads folder as a stack: sorted by Date Modified, displayed as Stack, viewed as Grid
@@ -589,7 +556,7 @@ for app in "Activity Monitor" \
     "Safari" \
     "SystemUIServer" \
     "iCal"; do
-    killall "${app}" &>/dev/null
+    killall "${app}" >/dev/null 2>&1 || true
 done
 
 echo "\n\n\n
