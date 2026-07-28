@@ -33,7 +33,7 @@ cask "google-chrome"
 cask "1password"
 cask "claude"
 cask "pearcleaner"
-cask "surfshark"
+cask "protonvpn"
 cask "logi-options-plus"
 
 # Cask Apps - Entertainment
