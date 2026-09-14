@@ -19,7 +19,6 @@ brew "mas"
 # Cask Apps - Dev Tools
 cask "ghostty"
 cask "visual-studio-code"
-cask "claude-code"
 
 # Cask Apps - Communication
 cask "slack"
@@ -31,7 +30,7 @@ cask "google-chrome"
 
 # Cask Apps - Tools
 cask "1password"
-cask "claude"
+cask "chatgpt"
 cask "pearcleaner"
 cask "protonvpn"
 cask "logi-options-plus"

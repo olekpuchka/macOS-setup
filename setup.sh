@@ -515,7 +515,7 @@ if command -v dockutil >/dev/null 2>&1; then
   dockutil --add /Applications/Things3.app --no-restart
   dockutil --add /System/Applications/Notes.app --no-restart
   dockutil --add /Applications/1Password.app --no-restart
-  dockutil --add /Applications/Claude.app --no-restart
+  dockutil --add /Applications/ChatGPT.app --no-restart
   dockutil --add /Applications/Visual\ Studio\ Code.app --no-restart
   dockutil --add /System/Applications/Apps.app --no-restart
   # Add Downloads folder as a stack: sorted by Date Modified, displayed as Stack, viewed as Grid
