@@ -33,7 +33,7 @@ cask "1password"
 cask "chatgpt"
 cask "pearcleaner"
 cask "protonvpn"
-cask "logi-options-plus"
+cask "logi-options+"
 
 # Cask Apps - Entertainment
 cask "spotify"

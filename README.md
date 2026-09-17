@@ -1,11 +1,14 @@
 # macOS Setup
 
-Fully automated apps, brew, and system settings setup for macOS (Apple Silicon).
+Fully automated apps, brew, and system settings setup for **macOS 27+ on Apple Silicon**.
 
 ## Run script
 
 > [!IMPORTANT]
 > Sign in to the App Store first — otherwise the App Store apps (`mas`) are skipped and the script continues without them.
+
+> [!NOTE]
+> Grant your terminal **Full Disk Access** first, or automatic date & time and the Spotlight reindex are skipped.
 
 ```
 sh setup.sh
@@ -21,7 +24,7 @@ sh setup.sh
 - Sets the default browser to Chrome (shows a confirmation dialog)
 - Sets up Dock layout with preferred apps via `dockutil`
 - Configures keyboard shortcuts (screenshot area: ⇧⌘1 / ⇧⌘2)
-- Applies 100+ macOS system defaults (Finder, Dock, Trackpad, Battery, etc.)
+- Applies ~95 macOS system settings (Finder, Dock, Trackpad, Battery, etc.)
 - Prompts for a restart at the end
 
 ## Customization

@@ -1,11 +1,32 @@
 #!/bin/sh
 set -e
 
+# Warn instead of aborting. Simple commands only; output left alone (mdutil
+# reports errors on stdout).
+best_effort() {
+  "$@" || echo "⚠️  skipped: $*"
+}
+
+# macOS 27+ only — keys below don't all exist on older releases.
+macos_major=$(sw_vers -productVersion | cut -d. -f1)
+if [ "$macos_major" -lt 27 ]; then
+  echo "This setup targets macOS 27 or later — found $(sw_vers -productVersion)." >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # Ask for the administrator password upfront
 sudo -v
 
 # Keep-alive sudo, update existing sudo time stamp until setup has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# systemsetup/mdutil need Full Disk Access — warn upfront, not halfway through.
+if ! head -c 1 "/Library/Application Support/com.apple.TCC/TCC.db" >/dev/null 2>&1; then
+  echo "⚠️  This terminal does not have Full Disk Access — a few system settings will be skipped."
+  echo "    Grant it in System Settings → Privacy & Security → Full Disk Access, then re-run."
+fi
 
 ###############################################################################
 # brew and apps setup                                                         #
@@ -24,14 +45,14 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 brew analytics off
 
 # Make sure we’re using the latest brew
-brew update
+brew update || echo "⚠️  brew update failed — continuing with the version you have"
 
 # Make sure your system is ready to brew
 brew doctor || true
 
 # Install all formulae, casks, and App Store apps from Brewfile
 # (don't abort the whole setup if e.g. mas apps fail because the App Store isn't signed in)
-brew bundle --file="$(cd "$(dirname "$0")" && pwd)/Brewfile" || \
+brew bundle --file="$SCRIPT_DIR/Brewfile" || \
   echo "⚠️  brew bundle reported failures (App Store not signed in for mas apps?) — continuing"
 
 # Remove the "Last login" message from the terminal
@@ -43,16 +64,21 @@ mkdir -p ~/"Projects"
 # Exclude Projects folder from Spotlight indexing
 touch ~/Projects/.metadata_never_index
 
+# Back up before the oh-my-zsh installer replaces it. cmp guard stops re-runs
+# piling up identical copies.
+if [ -f "$HOME/.zshrc" ] && ! cmp -s "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"; then
+  cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d%H%M%S)"
+fi
+
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 [ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ] || \
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
 [ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ] || \
-  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+  git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
 
-# Copy .zshrc config
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Copy .zshrc config (the backup happened above, before oh-my-zsh ran)
 cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"
 
 # nvm: create working dir and install the latest LTS Node
@@ -62,6 +88,9 @@ export NVM_DIR="$HOME/.nvm"
 
 # Restore Ghostty config
 mkdir -p "$HOME/.config/ghostty"
+if [ -f "$HOME/.config/ghostty/config" ] && ! cmp -s "$SCRIPT_DIR/ghostty.config" "$HOME/.config/ghostty/config"; then
+  cp "$HOME/.config/ghostty/config" "$HOME/.config/ghostty/config.backup.$(date +%Y%m%d%H%M%S)"
+fi
 cp "$SCRIPT_DIR/ghostty.config" "$HOME/.config/ghostty/config"
 
 ###############################################################################
@@ -69,6 +98,7 @@ cp "$SCRIPT_DIR/ghostty.config" "$HOME/.config/ghostty/config"
 ###############################################################################
 
 mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
 if [ ! -f "$HOME/.ssh/config" ] || ! grep -q '1password' "$HOME/.ssh/config" 2>/dev/null; then
   cat >> "$HOME/.ssh/config" <<'EOF'
 
@@ -106,24 +136,22 @@ git config --global user.signingkey "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAfMxj
 # MacOS System Settings                                                       #
 ###############################################################################
 
-# Close System Settings window to prevent overriding
-osascript -e 'tell application "System Settings" to quit'
+# Close System Settings to prevent overriding (needs Automation permission)
+best_effort osascript -e 'tell application "System Settings" to quit'
 
 # Set computer name
 sudo scutil --set ComputerName "Olek's MacBook Pro"
 sudo scutil --set HostName "Olek-MacBook-Pro"
 sudo scutil --set LocalHostName Olek-MacBook-Pro
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "Olek's MacBook Pro"
+# NetBIOS: max 15 chars, no spaces/apostrophes — longer names get replaced
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "OLEK-MBP"
 
 ###############################################################################
 # Wi-Fi                                                                       #
 ###############################################################################
 
 # Enable "Ask to join networks"
-defaults write com.apple.airport AskToJoinNetworks 1
-
-# Enable "Ask to join hotspots"
-defaults write com.apple.airport AskToJoinHotspots 1
+defaults write com.apple.airport AskToJoinNetworks -bool true
 
 ###############################################################################
 # Network                                                                     #
@@ -144,7 +172,17 @@ sudo nvram StartupMute=%01
 ###############################################################################
 
 # Enable "Set time and date automatically"
-sudo systemsetup -setusingnetworktime on
+# systemsetup exits 0 on failure and errors to stdout — check the output.
+nettime_out=$(sudo systemsetup -setusingnetworktime on 2>&1 || true)
+case "$(printf '%s' "$nettime_out" | tr '[:upper:]' '[:lower:]')" in
+  *"setusingnetworktime: on"*) ;;
+  *)
+    echo "⚠️  Could not confirm automatic date & time was enabled — grant Full Disk Access to your terminal, or set it in System Settings → General → Date & Time"
+    if [ -n "$nettime_out" ]; then
+      echo "    systemsetup said: $nettime_out"
+    fi
+    ;;
+esac
 
 # Enable "24-hour time"
 defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
@@ -154,9 +192,6 @@ sudo defaults write /Library/Preferences/com.apple.timezone.auto.plist Active -b
 
 # Increase window resize speed for Cocoa applications
 defaults write NSGlobalDomain NSWindowResizeTime -float 0.1
-
-# Prevent Time Machine from prompting to use new hard drives as backup volume
-defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 ###############################################################################
 # Appearance                                                                  #
@@ -169,11 +204,10 @@ defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
 defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
 
 # Click in the scroll bar to "jump to the next page"
-defaults write -g AppleScrollerPagingBehavior -bool false
+defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool false
 
 # Expand save panel by default
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 
 ###############################################################################
 # Control Center                                                              #
@@ -189,7 +223,11 @@ defaults write com.apple.controlcenter "NSStatusItem Visible Bluetooth" -bool tr
 defaults write com.apple.controlcenter "NSStatusItem Visible AirDrop" -bool false
 
 # Set "Focus" to "Show When Active"
-defaults write com.apple.controlcenter "NSStatusItem Visible DND" -bool true
+# macOS 27 names this module FocusModes (was DND)
+defaults write com.apple.controlcenter "NSStatusItem Visible FocusModes" -bool true
+
+# Unverified on 27: StageManager/Spotlight/Siri/TimeMachine/VPN aren't module
+# names in ControlCenter.app. Left in — check System Settings > Control Center.
 
 # Set "Stage Manager" to "Don't Show in Menu Bar"
 defaults write com.apple.controlcenter "NSStatusItem Visible StageManager" -bool false
@@ -222,11 +260,11 @@ defaults write com.apple.controlcenter "NSStatusItem Visible VPN" -bool false
 # Siri & Spotlight                                                            #
 ###############################################################################
 
-# Disable Ask Siri
-defaults write com.apple.assistant.support "Assistant Enabled" -bool false
+# Siri: not settable via defaults on 27 (rewrites the key). Use System Settings.
 
-# Change indexing order and disable some search results
-defaults write com.apple.spotlight orderedItems -array \
+# Indexing order + result filtering. Categories match macOS 27 (no PDF, has
+# MENU_WEBSEARCH).
+defaults write com.apple.Spotlight orderedItems -array \
   '{"enabled" = 1; "name" = "APPLICATIONS";}' \
   '{"enabled" = 1; "name" = "MENU_EXPRESSION";}' \
   '{"enabled" = 1; "name" = "CONTACT";}' \
@@ -242,22 +280,19 @@ defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 0; "name" = "MOVIES";}' \
   '{"enabled" = 0; "name" = "MUSIC";}' \
   '{"enabled" = 0; "name" = "MENU_OTHER";}' \
-  '{"enabled" = 1; "name" = "PDF";}' \
   '{"enabled" = 0; "name" = "PRESENTATIONS";}' \
   '{"enabled" = 0; "name" = "MENU_SPOTLIGHT_SUGGESTIONS";}' \
+  '{"enabled" = 0; "name" = "MENU_WEBSEARCH";}' \
   '{"enabled" = 0; "name" = "SPREADSHEETS";}' \
   '{"enabled" = 1; "name" = "SYSTEM_PREFS";}' \
   '{"enabled" = 0; "name" = "TIPS";}' \
   '{"enabled" = 1; "name" = "BOOKMARKS";}'
 
-# Load new settings before rebuilding the index
-sudo killall mds > /dev/null 2>&1
+# Make sure indexing is enabled for the main volume (mdutil needs FDA)
+best_effort sudo mdutil -i on /
 
-# Make sure indexing is enabled for the main volume
-sudo mdutil -i on / > /dev/null
-
-# Rebuild the index from scratch
-sudo mdutil -E / > /dev/null
+# Rebuild the index from scratch (runs hot for a while)
+best_effort sudo mdutil -E /
 
 ###############################################################################
 # Privacy & Security                                                          #
@@ -335,14 +370,6 @@ defaults write com.apple.finder "ShowHardDrivesOnDesktop" -bool true
 defaults write com.apple.dock "expose-group-apps" -bool true
 
 ###############################################################################
-# Displays                                                                    #
-###############################################################################
-
-# Enable font smoothing (anti-aliasing)
-defaults write -g CGFontRenderingFontSmoothingDisabled -bool FALSE
-defaults write NSGlobalDomain AppleFontSmoothing -int 1
-
-###############################################################################
 # Battery                                                                     #
 ###############################################################################
 
@@ -360,15 +387,6 @@ sudo pmset -c powernap 1
 
 # Set "Wake for network access" to "Only on Power Adapter"
 sudo pmset -c womp 1
-
-# Enable "Automatic graphics switching"
-sudo pmset -c gpuswitch 1
-
-# Disable "Optimize video streaming while on battery"
-sudo pmset -b gpuswitch 0
-
-# Enable lid wakeup
-sudo pmset -a lidwake 1
 
 ###############################################################################
 # Lock Screen                                                                 #
@@ -452,13 +470,6 @@ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true
 
 ###############################################################################
-# Printers & Scanners                                                         #
-###############################################################################
-
-# Automatically quit printer app once the print jobs complete
-defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
-
-###############################################################################
 # Finder                                                                      #
 ###############################################################################
 
@@ -470,10 +481,6 @@ defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
 # Don't write .DS_Store files to network or USB volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-
-# Prevent Photos from opening automatically when devices are plugged in
-defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 
 # Display full POSIX path as Finder window title
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
@@ -527,35 +534,32 @@ fi
 ###############################################################################
 
 # Save picture of selected area as a file: ⇧⌘2
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 31 '{ enabled = 1; value = { parameters = (50, 19, 1179648); type = standard; }; }'
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 30 '{ enabled = 1; value = { parameters = (50, 19, 1179648); type = standard; }; }'
 
 # Copy picture of selected area to the clipboard: ⇧⌘1
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 29 '{ enabled = 1; value = { parameters = (49, 18, 1179648); type = standard; }; }'
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 31 '{ enabled = 1; value = { parameters = (49, 18, 1179648); type = standard; }; }'
+
+# Restore id 29 to its ⌃⇧⌘3 default — an older version of this script
+# mis-assigned ⇧⌘1 here, colliding with id 31.
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 29 '{ enabled = 1; value = { parameters = (51, 20, 1441792); type = standard; }; }'
 
 ###############################################################################
 # Clean up brew installations and caches                                      #
 ###############################################################################
 
-brew cleanup --prune=all
+brew cleanup --prune=all || echo "⚠️  brew cleanup failed — continuing"
 
 ###############################################################################
 # Reset affected applications                                                 #
 ###############################################################################
 
-for app in "Activity Monitor" \
-    "Address Book" \
-    "Calendar" \
-    "cfprefsd" \
-    "Contacts" \
+# Only what this script reconfigures. cfprefsd first so the rest re-read.
+for app in "cfprefsd" \
     "Dock" \
     "Finder" \
-    "Google Chrome" \
-    "Mail" \
-    "Messages" \
-    "Photos" \
-    "Safari" \
-    "SystemUIServer" \
-    "iCal"; do
+    "ControlCenter" \
+    "WindowManager" \
+    "SystemUIServer"; do
     killall "${app}" >/dev/null 2>&1 || true
 done
 
@@ -567,7 +571,7 @@ echo "\n\n\n
 "
 
 printf "Restart now? (y/n) "
-read -r REPLY
+read -r REPLY || REPLY="${REPLY:-n}"
 if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
   sudo shutdown -r now
 fi
